@@ -1,0 +1,62 @@
+#PBS -N chr22_greedy_snp_5000_500           # job name
+#PBS -A GT-saluru8-CODA20               # account to which job is charged, ex: GT-gburdell3
+#PBS -l nodes=1:ppn=24           # number of nodes and cores per node required
+#PBS -l walltime=120:00:00          # duration of the job (ex: 15 min)
+
+
+echo " This is a bechmark for greedy_snp"
+
+alg=greedy_snp
+ID=22
+a=5000
+d=500
+chr=chr22
+LEN=100
+COUNT=100
+
+echo "RUN bechmarking VF, FORGe, HISAT2 for chrID =$chr, alph = $a and delta =$d"
+echo $PBS_O_WORKDIR
+
+cd /storage/coda1/p-saluru8/0/ntavakoli6/benchmark
+mainwd=$(pwd)
+cd $mainwd
+datasetwd=$mainwd/dataset
+results=$mainwd/results
+
+vg=$mainwd/software
+FORGe=$mainwd/software/FORGe
+hisat2=$mainwd/software/hisat-genotype-top
+#Note: bgzip and tabix are installed inside htslib
+bgzip=$mainwd/software/htslib-1.12
+tabix=$mainwd/software/htslib-1.12
+VF=$mainwd/software/VF
+
+CHRID=$chr
+REF=$datasetwd/hs37d5.fa
+
+VARFILE_SNP_zipped=$datasetwd/ALL.${CHRID}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz
+VARFILE_SNP=$datasetwd/ALL.${CHRID}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf
+
+chr_vcf=ALL.${CHRID}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf
+
+#******************************************************************************************************
+# Run our VF framework for Chr #ID
+#******************************************************************************************************
+cd $results/results_${CHRID}
+mkdir -p greedy_snp && cd greedy_snp
+
+$VF/build/${alg} -a $a -d $d -vcf $VARFILE_SNP -chr $ID -prefix ${alg}_reduced_vf_${CHRID}_alpha_${a}_delta_${d}
+echo "VF is done"
+
+echo "Start running FORGe on VF results"
+$FORGe/src/vcf_to_1ksnp.py  --reference $REF --vcf ${alg}_reduced_vf_${CHRID}_alpha_${a}_delta_${d}.retainedrecords.vcf --out ${alg}_${CHRID}_snp_VF_alpha_${a}_delta_${d}.1ksnp 
+$FORGe/src/rank.py --method popcov-blowup --reference $REF --vars ${alg}_${CHRID}_snp_VF_alpha_${a}_delta_${d}.1ksnp --window-size 100 --output ${alg}_ordered_${CHRID}_snp_VF_alpha_${a}_delta_${d}.txt
+$FORGe/src/build.py --reference  $REF --vars ${alg}_${CHRID}_snp_VF_alpha_${a}_delta_${d}.1ksnp --window-size 100 --hisat ${alg}_hisat_input_${CHRID}_snp_VF_alpha_${a}_delta_${d}.snp --sorted ${alg}_ordered_${CHRID}_snp_VF_alpha_${a}_delta_${d}.txt --pct 100
+$hisat2/hisat2-build --snp ${alg}_hisat_input_${CHRID}_snp_VF_alpha_${a}_delta_${d}.snp $REF ../${CHRID}_hisat_index/${alg}_${CHRID}_hisat_index_VF_alpha_${a}_delta_${d}
+echo "FORGe with pct=100 for VF variants is done"
+
+#map using HISAT2: simulated reads to graph indexes
+$hisat2/hisat2 -f -x ../${CHRID}_hisat_index/${alg}_${CHRID}_hisat_index_VF_alpha_${a}_delta_${d} -U ../reads_${CHRID}_${LEN}.fasta -S ${alg}_hisat_alignment_${CHRID}_snp_VF_alpha_${a}_delta_${d}.sam --summary-file ${alg}_hisat_alignment_summary_${CHRID}_snp_VF_alpha_${a}_delta_${d}.txt
+echo "HISAT2 mapping for VF is done"
+
+
