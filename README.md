@@ -18,5 +18,5 @@ at most delta errors (i.e., edit distance of delta among alpha-long substrings o
 - [igraph](https://github.com/igraph/igraph)
 - [OpenMP](https://curc.readthedocs.io/en/latest/programming/OpenMP-C.html)
 
-![Workflow](figs/problems_category.pdf)
+![List_of_Problems](figs/problems_category.png)
 
