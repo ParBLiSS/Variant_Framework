@@ -14,6 +14,24 @@
 
 ![List_of_Problems](figs/problems_category.png)
 
+## Framework Overview
+
+## Variant Filtering (VF)
+VF is a prototype software implementation of our algorithms for variant filtering in variation graphs for the problems 1 to 4.
+
+## VF_Experiments
+VF_Experiments is a framework to establish a benchmark for datasets and tools needed to evaluate the VF experiments and the impact of read-to-graph mappers.
+
+## Havg (Haplotype-annotated Variation Graph)
+Havg is used to create a variation graph that corresponds to each chromosome, annotated with a list of haplotypes per edge when the graph only contains SNP variants. This annotated graph is then used in solving problems 5 and 6.
+
+## hg (Haplotype-aware Graphs)
+This repository constructs an ILP solution for haplotype-aware variant selection for genome graphs under Hamming distance for solving problems 5 and 6.
+
+## hged (Haplotype-aware Edit Distance)
+This repository constructs an ILP solution for haplotype-aware variant selection for genome graphs under Hamming distance for solving problems 7 and 8.
+
+
 ```
 The project has the following folder structure:
 ```
@@ -103,19 +121,3 @@ The project has the following folder structure:
 
 ```
 
-## Framework Overview
-
-## Variant Filtering (VF)
-VF is a prototype software implementation of our algorithms for variant filtering in variation graphs for the problems 1 to 4.
-
-## VF_Experiments
-VF_Experiments is a framework to establish a benchmark for datasets and tools needed to evaluate the VF experiments and the impact of read-to-graph mappers.
-
-## Havg (Haplotype-annotated Variation Graph)
-Havg is used to create a variation graph that corresponds to each chromosome, annotated with a list of haplotypes per edge when the graph only contains SNP variants. This annotated graph is then used in solving problems 5 and 6.
-
-## hg (Haplotype-aware Graphs)
-This repository constructs an ILP solution for haplotype-aware variant selection for genome graphs under Hamming distance for solving problems 5 and 6.
-
-## hged (Haplotype-aware Edit Distance)
-This repository constructs an ILP solution for haplotype-aware variant selection for genome graphs under Hamming distance for solving problems 7 and 8.
